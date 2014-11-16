@@ -3,9 +3,9 @@
 ## Usage
 Import into maven
 
-### Examples
+## Examples
 
-### MapReduce
+#### MapReduce
 ##### PageViewStats
 
 ##### UniqueViewStats
