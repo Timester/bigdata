@@ -1,4 +1,4 @@
-package twitter;
+package net.talqum.hadoop.storm.twitter;
 
 import java.text.MessageFormat;
 import java.util.Map;

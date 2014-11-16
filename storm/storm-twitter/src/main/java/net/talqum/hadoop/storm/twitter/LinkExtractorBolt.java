@@ -1,4 +1,4 @@
-package twitter;
+package net.talqum.hadoop.storm.twitter;
 
 import twitter4j.Status;
 import twitter4j.URLEntity;

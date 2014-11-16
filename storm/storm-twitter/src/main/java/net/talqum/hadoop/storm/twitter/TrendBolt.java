@@ -1,4 +1,4 @@
-package twitter;
+package net.talqum.hadoop.storm.twitter;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
