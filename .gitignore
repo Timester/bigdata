@@ -50,3 +50,4 @@ crashlytics-build.properties
 .project
 .settings
 .classpath
+storm/storm-twitter/src/main/resources/auth.properties
