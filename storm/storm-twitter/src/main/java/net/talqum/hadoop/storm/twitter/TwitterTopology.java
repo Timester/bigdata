@@ -19,19 +19,20 @@ public class TwitterTopology {
     }
 
     public void start(){
-        loadproperties();
+        loadProperties();
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("tweets-collector", new TwitterSpout(properties));
         builder.setBolt("urlemitter", new LinkExtractorBolt()).shuffleGrouping("tweets-collector");
         builder.setBolt("urlcounter", new TrendBolt()).fieldsGrouping("urlemitter", new Fields("tweet-link"));
         builder.setBolt("urlcounter-printer", new PritingBolt()).shuffleGrouping("urlcounter");
+
         LocalCluster cluster = new LocalCluster();
         Config conf = new Config();
         cluster.submitTopology("twitter-test", conf, builder.createTopology());
     }
 
-    private void loadproperties(){
+    private void loadProperties(){
         try(InputStream is = new FileInputStream("auth.properties")){
             properties.load(is);
         }catch (Exception e){

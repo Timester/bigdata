@@ -15,8 +15,6 @@ import java.util.StringTokenizer;
  */
 public class SiteViewStage2Mapper extends Mapper<LongWritable, Text, IntWritable, Text> {
 
-    private final static IntWritable one = new IntWritable(1);
-
     @Override
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         StringTokenizer tokenizer = new StringTokenizer(value.toString());

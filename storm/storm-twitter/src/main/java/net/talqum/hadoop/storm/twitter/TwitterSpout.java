@@ -1,7 +1,6 @@
 package net.talqum.hadoop.storm.twitter;
 
 import org.apache.log4j.Logger;
-import org.json.simple.parser.JSONParser;
 
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -26,13 +25,10 @@ import backtype.storm.tuple.Values;
 
 public class TwitterSpout extends BaseRichSpout implements StatusListener {
 
-    static String STREAMING_API_URL = "https://stream.twitter.com/1/statuses/filter.json?track=";
     static Logger LOG = Logger.getLogger(TwitterSpout.class);
-    static JSONParser jsonParser = new JSONParser();
     private final Properties properties;
     private LinkedBlockingQueue<Status> queue = null;
     private SpoutOutputCollector collector;
-    int currentIndex = 0;
 
     public TwitterSpout(Properties properties) {
         this.properties = properties;

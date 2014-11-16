@@ -43,7 +43,7 @@ public class UniqueSessionDriver extends Configured implements Tool {
 public class UniqueSessionDriver{
 
     public static void main(String[] args) throws Exception{
-        Job job = new Job();
+        Job job = Job.getInstance();
         job.setJarByClass(UniqueSessionDriver.class);
 
         FileInputFormat.addInputPath(job, new Path(args[0]));

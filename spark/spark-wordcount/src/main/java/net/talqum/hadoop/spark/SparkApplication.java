@@ -34,7 +34,7 @@ public class SparkApplication {
         JavaPairRDD<String, Integer> ones = words.mapToPair(new PairFunction<String, String, Integer>() {
             @Override
             public Tuple2<String, Integer> call(String s) {
-                return new Tuple2<String, Integer>(s, 1);
+                return new Tuple2<>(s, 1);
             }
         });
         JavaPairRDD<String, Integer> counts = ones.reduceByKey(new Function2<Integer, Integer, Integer>() {
