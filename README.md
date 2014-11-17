@@ -24,5 +24,5 @@ Auth credentials goes to the auth.properties file
 
 #### Mahout
 ##### Recommender
-Basic collaborative filtering examples, user amd item based recommender engines.
+Basic collaborative filtering examples, user and item based recommender engines.
 
