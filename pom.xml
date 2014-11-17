@@ -12,7 +12,6 @@
     <modules>
         <module>mapreduce/UniqueViewStats</module>
         <module>mapreduce/PageViewStats</module>
-        <module>mapreduce/PageViewStatsStage2</module>
         <module>spark/spark-streaming-wordcount</module>
         <module>spark/spark-wordcount</module>
         <module>storm/storm-twitter</module>
@@ -38,16 +37,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>2.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>2.5.1</version>
-        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
