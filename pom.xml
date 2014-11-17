@@ -15,6 +15,7 @@
         <module>spark/spark-streaming-wordcount</module>
         <module>spark/spark-wordcount</module>
         <module>storm/storm-twitter</module>
+        <module>mahout/user-recommendations</module>
     </modules>
 
     <properties>

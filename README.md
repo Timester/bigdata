@@ -21,3 +21,8 @@ Counts the unique pageviews/day
 #### Storm
 ##### Storm Twitter
 Auth credentials goes to the auth.properties file
+
+#### Mahout
+##### Recommender
+Basic collaborative filtering examples, user amd item based recommender engines.
+
