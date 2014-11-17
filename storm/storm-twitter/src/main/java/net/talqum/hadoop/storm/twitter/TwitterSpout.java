@@ -1,7 +1,5 @@
 package net.talqum.hadoop.storm.twitter;
 
-import org.apache.log4j.Logger;
-
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
@@ -25,7 +23,6 @@ import backtype.storm.tuple.Values;
 
 public class TwitterSpout extends BaseRichSpout implements StatusListener {
 
-    static Logger LOG = Logger.getLogger(TwitterSpout.class);
     private final Properties properties;
     private LinkedBlockingQueue<Status> queue = null;
     private SpoutOutputCollector collector;

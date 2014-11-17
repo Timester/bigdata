@@ -23,9 +23,16 @@ public class TwitterTopology {
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("tweets-collector", new TwitterSpout(properties));
+
         builder.setBolt("urlemitter", new LinkExtractorBolt()).shuffleGrouping("tweets-collector");
-        builder.setBolt("urlcounter", new TrendBolt()).fieldsGrouping("urlemitter", new Fields("tweet-link"));
-        builder.setBolt("urlcounter-printer", new PritingBolt()).shuffleGrouping("urlcounter");
+        builder.setBolt("hashtagemitter", new HashtagExtractorBolt()).shuffleGrouping("tweets-collector");
+
+        builder.setBolt("urlcounter", new TrendBolt()).fieldsGrouping("urlemitter", new Fields("tweet-element"));
+        builder.setBolt("hashtagcounter", new TrendBolt()).fieldsGrouping("hashtagemitter", new Fields("tweet-element"));
+
+       // builder.setBolt("urlcounter-printer", new PritingBolt()).shuffleGrouping("urlcounter");
+      //  builder.setBolt("hashtagcounter-printer", new PritingBolt()).shuffleGrouping("hashtagcounter");
+        builder.setBolt("counter-printer", new PritingBolt()).shuffleGrouping("urlcounter").shuffleGrouping("hashtagcounter");
 
         LocalCluster cluster = new LocalCluster();
         Config conf = new Config();

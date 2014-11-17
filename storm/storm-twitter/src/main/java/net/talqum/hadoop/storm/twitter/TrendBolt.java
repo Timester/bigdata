@@ -12,16 +12,16 @@ import backtype.storm.tuple.Values;
 
 public class TrendBolt extends BaseBasicBolt {
 
-    private final HashMap<String, Integer> links = new HashMap<>();
+    private final HashMap<String, Integer> elements = new HashMap<>();
     private static final long THRESHOLD = 30 * 1000;
     private long lastEmit = 0;
 
     private synchronized void increment(String element) {
-        Integer count = links.get(element);
+        Integer count = elements.get(element);
         if (count == null) {
-            links.put(element, 1);
+            elements.put(element, 1);
         } else {
-            links.put(element, count + 1);
+            elements.put(element, count + 1);
         }
     }
 
@@ -31,16 +31,16 @@ public class TrendBolt extends BaseBasicBolt {
 
     @Override
     public void execute(Tuple input, BasicOutputCollector collector) {
-        String link = input.getStringByField("tweet-link");
-        link = link.trim();
-        increment(link);
+        String element = input.getStringByField("tweet-element");
+        element = element.trim();
+        increment(element);
         final long now = System.currentTimeMillis();
         if (now > lastEmit + THRESHOLD) {
             System.out.println("===========  EMITTING  ==========");
-            for (Entry<String, Integer> entry : links.entrySet()) {
+            for (Entry<String, Integer> entry : elements.entrySet()) {
                 collector.emit(new Values(entry.getKey(), entry.getValue()));
             }
-            links.clear();
+            elements.clear();
             System.out.println("=========  EMITTING END =========");
             lastEmit = now;
         }
@@ -49,7 +49,7 @@ public class TrendBolt extends BaseBasicBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("link", "linkcount"));
+        declarer.declare(new Fields("element", "elementcount"));
     }
 
 }
