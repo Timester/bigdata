@@ -1,5 +1,7 @@
 # Hadoop BigData examples
 
+Examples for bigdata tools using the newest features (lambdas, etc...)
+
 ## Usage
 Import into maven
 
@@ -15,8 +17,10 @@ Counts the unique pageviews/day
 
 #### Spark
 ##### Spark wordcount
+Counts the words in a given file
 
-##### Spark streaming
+##### Spark streaming wordcount
+Counts the words in an incoming stream
 
 #### Storm
 ##### Storm Twitter
