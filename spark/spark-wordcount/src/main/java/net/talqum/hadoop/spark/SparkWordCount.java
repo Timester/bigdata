@@ -18,9 +18,7 @@ public class SparkWordCount {
         }
 
         final String outputPath = args[1];
-        SparkConf sparkConf = new SparkConf().setAppName("SparkWordCount");
-        sparkConf.setMaster("local");
-
+        SparkConf sparkConf = new SparkConf().setAppName("SparkWordCount").setMaster("local");
         JavaSparkContext ctx = new JavaSparkContext(sparkConf);
 
         JavaRDD<String> lines = ctx.textFile(args[0], 1);
