@@ -1,12 +1,18 @@
 package net.talqum.hadoop.spark;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * Created by Imre on 2014.11.25..
  */
-public class TrafficLogEntry {
+
+public class TrafficLogEntry implements Comparable, Serializable{
+
+    private static final long serialVersionUID = 7526472195622776147L;
+
     private String host;
     private LocalDateTime visitedAt;
     private String pageURL;
@@ -17,8 +23,8 @@ public class TrafficLogEntry {
         this.host = words[0];
         this.pageURL = words[6];
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss");
-        this.visitedAt = LocalDateTime.parse(words[4].substring(1), formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss").withLocale(Locale.US);
+        this.visitedAt = LocalDateTime.parse(words[3].substring(1), formatter);
     }
 
     public String getHost() {
@@ -75,5 +81,30 @@ public class TrafficLogEntry {
         result = 31 * result + visitedAt.hashCode();
         result = 31 * result + pageURL.hashCode();
         return result;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (this == o) {
+            return 0;
+        }
+
+        TrafficLogEntry that = (TrafficLogEntry) o;
+
+        if(this.visitedAt.isAfter(that.visitedAt)){
+            return -1;
+        }
+        else{
+            return 1;
+        }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer();
+        sb.append("{pageURL='").append(pageURL).append('\'');
+        sb.append(", visitedAt=").append(visitedAt);
+        sb.append('}');
+        return sb.toString();
     }
 }
