@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 /**
  * HTML lapletöltések hisztogramja
  * host, letöltésszám jön a stage 1 ből
+ * mapper -> letöltésszám, host
  * Created by Imre on 2014.11.12..
  */
 public class SiteViewStage2Mapper extends Mapper<LongWritable, Text, IntWritable, Text> {

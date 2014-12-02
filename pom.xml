@@ -12,7 +12,7 @@
     <modules>
         <module>mapreduce/UniqueViewStats</module>
         <module>mapreduce/PageViewStats</module>
-        <module>spark/spark-last2pages</module>
+        <module>spark/spark-unique-view-stats</module>
         <module>spark/spark-streaming-wordcount</module>
         <module>spark/spark-wordcount</module>
         <module>storm/storm-twitter</module>

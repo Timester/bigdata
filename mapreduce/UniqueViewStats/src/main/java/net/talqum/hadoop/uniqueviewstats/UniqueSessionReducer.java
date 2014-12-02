@@ -9,7 +9,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 
 /**
- * Mapper for UniqueSession counter
+ * Reducer for UniqueSession counter
  * Created by Imre on 2014.11.12..
  */
 public class UniqueSessionReducer extends Reducer<Text, Text, Text, IntWritable> {

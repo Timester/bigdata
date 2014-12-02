@@ -7,6 +7,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 
 /**
+ * letöltésszám, list<host>
+ * reducer -> letöltésszám, hostszám
  * Created by Imre on 2014.11.12..
  */
 public class SiteViewStage2Reducer extends Reducer<IntWritable, Text, IntWritable, IntWritable> {
