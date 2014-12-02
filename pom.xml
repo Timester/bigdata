@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.talqum.hadoop</groupId>
-    <artifactId>BigDataHW</artifactId>
+    <artifactId>BigData</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
 
     <modules>
-        <module>mapreduce/UniqueViewStats</module>
-        <module>mapreduce/PageViewStats</module>
+        <module>mapreduce/mapreduce-pageview-stats</module>
+        <module>mapreduce/mapreduce-unique-pageviews</module>
         <module>spark/spark-unique-view-stats</module>
         <module>spark/spark-streaming-wordcount</module>
         <module>spark/spark-wordcount</module>

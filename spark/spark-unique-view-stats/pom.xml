@@ -7,7 +7,7 @@
 	<name>spark-unique-view-stats</name>
 
 	<parent>
-		<artifactId>BigDataHW</artifactId>
+		<artifactId>BigData</artifactId>
 		<groupId>net.talqum.hadoop</groupId>
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
