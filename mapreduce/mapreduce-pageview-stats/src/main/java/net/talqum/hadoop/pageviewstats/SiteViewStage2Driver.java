@@ -1,5 +1,6 @@
 package net.talqum.hadoop.pageviewstats;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -17,37 +18,12 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
  * reducer -> host, letöltésszám
  * az azonos számúakat nézőket megszámolni
  */
-/*
-public class SiteViewStage2Driver extends Configured implements Tool {
-
-    @Override
-    public int run(String[] args) throws Exception {
-        Job job = Job.getInstance(getConf(), "Site View counter");
-        job.setJarByClass(getClass());
-
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-        job.setMapperClass(SiteViewStage2Mapper.class);
-        job.setReducerClass(SiteViewStage2Reducer.class);
-
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
-
-        return job.waitForCompletion(true) ? 0 : 1;
-    }
-
-    public static void main(String[] args) throws Exception {
-        int exitCode = ToolRunner.run(new SiteViewStage2Driver(), args);
-        System.exit(exitCode);
-    }
-}
-*/
 
 public class SiteViewStage2Driver{
 
     public static void main(String[] args) throws Exception{
-        Job job = Job.getInstance();
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "Stage2");
         job.setJarByClass(SiteViewStage2Driver.class);
 
         FileInputFormat.addInputPath(job, new Path(args[0]));

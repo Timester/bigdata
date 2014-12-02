@@ -11,6 +11,9 @@ import java.io.IOException;
  * Created by Imre on 2014.11.12..
  */
 public class SiteViewReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+
+    private IntWritable result = new IntWritable();
+
     @Override
     public void reduce(Text key, Iterable<IntWritable> values, Context context)
         throws IOException, InterruptedException {
@@ -18,7 +21,8 @@ public class SiteViewReducer extends Reducer<Text, IntWritable, Text, IntWritabl
         for(IntWritable curr : values) {
             sum += curr.get();
         }
+        result.set(sum);
 
-        context.write(key, new IntWritable(sum));
+        context.write(key, result);
     }
 }
