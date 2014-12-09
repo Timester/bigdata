@@ -3,7 +3,7 @@
 Examples for bigdata tools using the newest features (lambdas, etc...)
 
 ## Usage
-Import into maven
+Import projects into maven.
 
 ## Examples
 
@@ -13,18 +13,24 @@ Data for the mapreduce examples can be downloaded from here: http://ita.ee.lbl.g
 ##### PageViewStats
 
 ##### UniqueViewStats
-Counts the unique pageviews/day
+Counts the unique pageviews/day.
 
 #### Spark
 ##### Spark wordcount
-Counts the words in a given file
+Counts the words in a given file.
 
 ##### Spark streaming wordcount
-Counts the words in an incoming stream
+Counts the words in an incoming stream.
 
 #### Storm
 ##### Storm Twitter
-Auth credentials goes to the auth.properties file
+SHows the trending URLs and tags.
+Auth credentials goes to a file called auth.properties in the resources folder. Four properties needed:
+
+auth.consumerkey=
+auth.consumersecret=
+auth.accesstoken=
+auth.accesstokensecret=
 
 #### Mahout
 ##### Recommender
