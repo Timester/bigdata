@@ -24,12 +24,12 @@ Counts the words in an incoming stream.
 
 #### Storm
 ##### Storm Twitter
-SHows the trending URLs and tags.
+SHows the trending URLs and tags.<br>
 Auth credentials goes to a file called auth.properties in the resources folder. Four properties needed:
 
-auth.consumerkey=
-auth.consumersecret=
-auth.accesstoken=
+auth.consumerkey=<br>
+auth.consumersecret=<br>
+auth.accesstoken=<br>
 auth.accesstokensecret=
 
 #### Mahout
