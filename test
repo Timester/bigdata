@@ -1,0 +1,374 @@
+# BI Labor laborvezetői útmutató
+## 0. feladat
+VM kiadás (pendrive)
+VM elindítása (6 GB RAM)
+
+## 1. feladat
+1.0 Flume telepítése
+Letöltési link: https://flume.apache.org/download.html vagy pendrive
+
+1.1 movies betöltése
+Adat letöltése githubról
+Saves as UTF-8
+új mappa létrehozása!!!!
+flumeconf elkészítése útmutató alapján
+Flume indítása:
+```
+./bin/flume-ng agent -n movieagent -c conf -f conf/flume-conf.properties
+```
+
+1.2 ratings betöltése
+Kiegészíteni az előző configot az útmutatóban lévőkkel, és a path-t lecserélni
+
+2.0 - Fájlok hdfs-re
+hue username, password: cloudera
+home-on belül hozzunk létre ratings és movies mappát és toljuk be a processed mappák tartalmát
+
+2.1 - movies tábla betöltése
+HIVE query editorban bepötyögjük az útmutatóban lévő parancsokat.
+Data samplet megnézzük, örülünk!
+
+2.2 - ratings tábla betöltése
+Metastore tableben megcsinálhatjuk internalként is
+oszlopok (userID INT, movieID INT, rating INT, timestamp TIMESTAMP)
+nézhetünk itt is sample datat, és örülhetünk is.
+
+2.3 - akciófilmek listája
+Lefuttatjuk a queryt az útmutatóból, és örömujjongásban törünk ki.
+
+2.4 - értékelések eloszlása
+Lefuttatjuk a queryt az útmutatóból, és örömujjongásban törünk ki.
+
+===== Önálló feladatok =====
+1. feladat
+
+flume config:
+
+# Name the components on this agent
+movieagent.sources = r1
+movieagent.sinks = k1
+movieagent.channels = c1
+
+# Describe/configure the source
+movieagent.sources.r1.type = spooldir
+movieagent.sources.r1.spoolDir = /home/cloudera/Downloads/users/raw
+movieagent.sources.r1.interceptors = filter
+movieagent.sources.r1.interceptors.filter.type = regex_filter
+movieagent.sources.r1.interceptors.filter.regex = [0-9]+\u0001(M|F)\u0001(1)\u0001.*
+movieagent.sources.r1.interceptors.filter.excludeEvents = true
+
+# Describe the sink
+movieagent.sinks.k1.type = file_roll
+movieagent.sinks.k1.sink.directory = /home/cloudera/Downloads/users/processed
+movieagent.sinks.k1.batchSize = 1000
+
+# Use a channel which buffers events in memory
+movieagent.channels.c1.type = memory
+movieagent.channels.c1.capacity = 1000
+movieagent.channels.c1.transactionCapacity = 100
+
+# Bind the source and sink to the channel
+movieagent.sources.r1.channels = c1
+movieagent.sinks.k1.channel = c1
+
+Töltsük fel hiveba
+
+2. feladat
+új tábla:
+userid INT, gender STRING, age INT, occupation INT, zipcode INT
+
+melyik 10 filmre van a legtöbb értékelés:
+SELECT DISTINCT temp.count, movies.title, movies.id FROM movies JOIN
+(SELECT COUNT(*) as count, ratings.movieid as movieid FROM ratings GROUP BY ratings.movieid) temp ON
+temp.movieid = movies.id ORDER BY temp.count DESC LIMIT 10;
+
+melyik 10 filmre van a legtöbb 1-es értékelés:
+SELECT DISTINCT temp.count, movies.title, movies.id FROM movies JOIN
+(SELECT COUNT(*) as count, ratings.movieid as movieid FROM ratings where ratings.rating = 1 GROUP BY ratings.movieid) temp ON
+temp.movieid = movies.id ORDER BY temp.count DESC LIMIT 10;
+
+3.feladat
+
+egyedi userek a ratings alapján Java 8:
+
+package hu.bme.aut.bi;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
+/**
+ * Count of distinct user from the ratings
+ */
+public class SparkDistinctUsers {
+
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.err.println("Usage: SparkDistinctUsers <input-file> <output-folder>");
+            System.exit(1);
+        }
+
+        final String outputPath = args[1];
+        SparkConf sparkConf = new SparkConf().setAppName("SparkDistinctUsers").setMaster("local");
+        JavaSparkContext ctx = new JavaSparkContext(sparkConf);
+
+        // line example: 1!2804!5!978300719
+        JavaRDD<String> lines = ctx.textFile(args[0], 1);
+
+        JavaRDD<Rating> ratings = lines.map(Rating::new).distinct();
+
+        long userCount = ratings.count();
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))){
+            writer.write(Long.toString(userCount));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ctx.stop();
+    }
+}
+
+
+
+egyedi userek a ratings alapján Java 7:
+
+
+package hu.bme.aut.bi;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
+/**
+ * Count of distinct user from the ratings
+ */
+public class SparkDistinctUsers {
+
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.err.println("Usage: SparkDistinctUsers <input-file> <output-folder>");
+            System.exit(1);
+        }
+
+        final String outputPath = args[1];
+        SparkConf sparkConf = new SparkConf().setAppName("SparkDistinctUsers").setMaster("local");
+        JavaSparkContext ctx = new JavaSparkContext(sparkConf);
+
+        // line example: 1!2804!5!978300719
+        JavaRDD<String> lines = ctx.textFile(args[0], 1);
+
+        JavaRDD<Rating> ratings = lines.map(new Function<String, Rating>() {
+            public Rating call(String line) throws Exception {
+                return new Rating(line);
+            }
+        }).distinct();
+
+        long userCount = ratings.count();
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))){
+            writer.write(Long.toString(userCount));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ctx.stop();
+    }
+}
+
+
+Rating.java: (sima pojo, konstruktor parseolja a sort, getter setter, eq és hashkód felülírva hogy csak a userid alapján döntse el hogy egyezik-e kettő, ez kell a distinctséghez, a .distinct() hívás ezeket használja)
+
+package hu.bme.aut.bi;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+
+public class Rating implements Serializable {
+
+
+// line example: 1!2804!5!978300719
+
+    private int userId;
+    private int movieId;
+    private int rating;
+    private LocalDateTime timestamp;
+
+    public Rating(String line) {
+
+        String[] split = line.split("!");
+
+        this.userId = Integer.parseInt(split[0]);
+        this.movieId = Integer.parseInt(split[1]);
+        this.rating = Integer.parseInt(split[2]);
+        this.timestamp = LocalDateTime.ofEpochSecond(Long.parseLong(split[3]), 0, ZoneOffset.UTC);
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(int movieId) {
+        this.movieId = movieId;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Rating rating = (Rating) o;
+
+        return userId == rating.userId;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return userId;
+    }
+}
+
+
+Átlagos értékelés userenként Java 8:
+
+package hu.bme.aut.bi;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import scala.Tuple2;
+
+
+/**
+ * Average of ratings by user
+ */
+public class SparkUserAvgRatings {
+
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.err.println("Usage: SparkDistinctUsers <input-file> <output-folder>");
+            System.exit(1);
+        }
+
+        final String outputPath = args[1];
+        SparkConf sparkConf = new SparkConf().setAppName("SparkDistinctUsers").setMaster("local");
+        JavaSparkContext ctx = new JavaSparkContext(sparkConf);
+
+        // line example: 1!2804!5!978300719
+        JavaRDD<String> lines = ctx.textFile(args[0], 1);
+
+        // userid, rating 
+        JavaPairRDD<Integer, Integer> ratings = lines.mapToPair(s -> new Tuple2<>(Integer.parseInt(s.split("!")[0]), Integer.parseInt(s.split("\u0001")[2])));
+
+        // userid, (rating, 1)
+        JavaPairRDD<Integer, Tuple2<Integer, Integer>> mappedRatings = ratings.mapValues(x -> new Tuple2<>(x, 1));
+
+        // userid, (ratingsum, ratingcount)
+        JavaPairRDD<Integer, Tuple2<Integer, Integer>> reduced = mappedRatings.reduceByKey((x, y) -> new Tuple2<>(x._1 + y._1, x._2 + y._2));
+
+        reduced.mapToPair(x -> new Tuple2<>(x._1, (double)(x._2._1) / x._2._2)).saveAsTextFile(outputPath);
+
+        ctx.stop();
+    }
+}
+
+Átlagos értékelés userenként Java 7:
+
+package hu.bme.aut.bi;
+
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.PairFunction;
+import scala.Tuple2;
+
+
+/**
+ * Average of ratings by user
+ */
+public class SparkUserAvgRatings {
+
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.err.println("Usage: SparkDistinctUsers <input-file> <output-folder>");
+            System.exit(1);
+        }
+
+        final String outputPath = args[1];
+        SparkConf sparkConf = new SparkConf().setAppName("SparkDistinctUsers").setMaster("local");
+        JavaSparkContext ctx = new JavaSparkContext(sparkConf);
+
+        // line example: 128045978300719
+        JavaRDD<String> lines = ctx.textFile(args[0], 1);
+
+        // userid, rating
+        JavaPairRDD<Integer, Integer> ratings = lines.mapToPair(new PairFunction<String, Integer, Integer>() {
+            public Tuple2<Integer, Integer> call(String s) throws Exception {
+                return new Tuple2<>(Integer.parseInt(s.split("\u0001")[0]), Integer.parseInt(s.split("\u0001")[2]));
+            }
+        });
+
+        // userid, (rating, 1)
+        JavaPairRDD<Integer, Tuple2<Integer, Integer>> mappedRatings = ratings.mapValues(new Function<Integer, Tuple2<Integer, Integer>>() {
+            public Tuple2<Integer, Integer> call(Integer rating) throws Exception {
+                return new Tuple2<>(rating, 1);
+            }
+        });
+
+        // userid, (ratingsum, ratingcount)
+        JavaPairRDD<Integer, Tuple2<Integer, Integer>> reduced = mappedRatings.reduceByKey(new Function2<Tuple2<Integer, Integer>, Tuple2<Integer, Integer>, Tuple2<Integer, Integer>>() {
+            public Tuple2<Integer, Integer> call(Tuple2<Integer, Integer> x, Tuple2<Integer, Integer> y) throws Exception {
+                return new Tuple2<>(x._1 + y._1, x._2 + y._2);
+            }
+        });
+
+        // userid, avg
+        JavaPairRDD<Integer, Double> finalAvg = reduced.mapToPair(new PairFunction<Tuple2<Integer, Tuple2<Integer, Integer>>, Integer, Double>() {
+            public Tuple2<Integer, Double> call(Tuple2<Integer, Tuple2<Integer, Integer>> x) throws Exception {
+                return new Tuple2<>(x._1, (double) (x._2._1) / x._2._2);
+            }
+        });
+
+        finalAvg.saveAsTextFile(outputPath);
+        
+        ctx.stop();
+    }
+}
